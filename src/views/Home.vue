@@ -1,18 +1,41 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="h-100">
+    <Chat/>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import Chat from '@/components/Chat'
+import { PokeApi } from '@/api'
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+    Chat
+  },
+  data () {
+    return {
+      pokemonList: []
+    }
+  },
+  created () {
+    this.initData()
+  },
+  methods: {
+    async initData () {
+      /**
+       * Fetch first 10 names of pokemon repository
+       */
+      try {
+        this.pokemonList = await PokeApi.list()
+          .then(
+            list => list.results.slice(0, 10)
+              .map(pokemon => pokemon.name)
+          )
+      } catch (error) {
+        console.log(error)
+      }
+    }
   }
 }
 </script>
