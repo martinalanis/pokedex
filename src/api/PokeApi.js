@@ -20,5 +20,13 @@ export default
     return await fetch(`${baseUrl}/pokemon/${pokemon}`)
       .then(res => res.json())
       .then(res => res.weight)
+  },
+  /**
+   * @returns Number
+   */
+  getHeight: async (pokemon) => {
+    return await fetch(`${baseUrl}/pokemon/${pokemon}`)
+      .then(res => res.json())
+      .then(res => res.height)
   }
 }

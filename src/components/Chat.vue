@@ -58,10 +58,14 @@ export default {
       try {
         const { default_answer, parameters, intent_info } = await Hermes.askQuestion(this.sessionId, question)
           .then(res => res.current_response)
-        // Add to conversation in bot mode
-        if (parameters.entities && intent_info) {
+        /**
+         * Case 1: Ask for feature and Pokemon found in available list
+         * Case 2: Ask for feature but Pokemon not found in chatBot list
+         * case 3: Ask for general topic ex. greeting
+         */
+        if (parameters.entities) {
           this.handleResponse(default_answer, parameters, intent_info)
-        } else if (!intent_info.properties) {
+        } else if (!parameters.entities && intent_info.properties) {
           this.pushToConversation('Por el momento no cuento con la información de ese pokemon', false)
         } else {
           this.pushToConversation(default_answer, false)
@@ -80,7 +84,7 @@ export default {
        */
       const { type } = JSON.parse(intentInfo.properties)
       console.log(type)
-      const availableFeatures = ['ability', 'weight']
+      const availableFeatures = ['ability', 'weight', 'height']
       if (availableFeatures.includes(type)) {
         console.log('includes')
         this[`${type}Response`](answer, pokemons)
@@ -118,6 +122,20 @@ export default {
         }
         this.pushToConversation(
           answer + ' ' + weights.join(' y '),
+          false
+        )
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async heightResponse (answer, pokemons) {
+      try {
+        const heights = []
+        for (const pokemon of pokemons) {
+          heights.push(await PokeApi.getHeight(pokemon))
+        }
+        this.pushToConversation(
+          answer + ' ' + heights.join(' y '),
           false
         )
       } catch (error) {
