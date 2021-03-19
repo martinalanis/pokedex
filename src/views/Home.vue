@@ -11,11 +11,6 @@ export default {
   name: 'Home',
   components: {
     Chat
-  },
-  data () {
-    return {
-      pokemonList: []
-    }
   }
 }
 </script>

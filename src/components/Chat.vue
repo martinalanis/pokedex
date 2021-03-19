@@ -47,7 +47,6 @@ export default {
   created () {
     this.sessionId = new Date().getTime()
     setTimeout(() => {
-      // this.pushToConversation('Hola', true)
       this.askQuestion('Hola')
     }, 1000)
   },
@@ -71,6 +70,38 @@ export default {
         console.log(error)
       }
     },
+    handleResponse (answer, parameters, intentInfo) {
+      /**
+       * Get pokemons detected by chatbot
+       */
+      const pokemons = parameters.entities.map(entity => entity.name)
+      /**
+       * Get type of request to perform to pokeApi and validate has implemented method
+       */
+      const { type } = JSON.parse(intentInfo.properties)
+      console.log(type)
+      const availableFeatures = ['ability', 'weight']
+      if (availableFeatures.includes(type)) {
+        console.log('includes')
+        this[`${type}Response`](answer, pokemons)
+      }
+    },
+    async abilityResponse (answer, pokemons) {
+      try {
+        const abilities = []
+        for (const pokemon of pokemons) {
+          const pokemonAbilities = await PokeApi.getAbilities(pokemon)
+            .then(res => res.map(obj => obj.ability.name).join(', '))
+          abilities.push(pokemonAbilities)
+        }
+        this.pushToConversation(
+          answer + ' ' + abilities.join(' y '),
+          false
+        )
+      } catch (error) {
+        console.log(error)
+      }
+    },
     async getAbilities (pokemon) {
       try {
         return await PokeApi.getAbilities(pokemon)
@@ -79,20 +110,16 @@ export default {
         console.log(error)
       }
     },
-    async handleResponse (answer, parameters, intentInfo) {
+    async weightResponse (answer, pokemons) {
       try {
-        const pokemons = parameters.entities.map(entity => entity.name)
-        const { type } = JSON.parse(intentInfo.properties)
-        if (type === 'ability') {
-          const abilities = []
-          for (const pokemon of pokemons) {
-            abilities.push(await this.getAbilities(pokemon))
-          }
-          this.pushToConversation(
-            answer + ' ' + abilities.join(' y '),
-            false
-          )
+        const weights = []
+        for (const pokemon of pokemons) {
+          weights.push(await PokeApi.getWeight(pokemon))
         }
+        this.pushToConversation(
+          answer + ' ' + weights.join(' y '),
+          false
+        )
       } catch (error) {
         console.log(error)
       }
@@ -105,7 +132,6 @@ export default {
         })
         if (isUser) {
           this.currentMessage = ''
-          // console.log('ask to bot')
           this.askQuestion(message)
         }
         this.updateScroll()
@@ -137,7 +163,6 @@ export default {
     align-items: center;
     justify-items: flex-end;
     overflow-y: hidden;
-    // border: 1px solid blue;
   }
   &__box_container {
     overflow-y: auto;
@@ -150,7 +175,6 @@ export default {
     width: 100%;
     display: block;
     padding: 0.3rem 1rem;
-    // border: 1px solid rgba(0,0,0,0.1);
     border-radius: 20px;
     border: none;
     box-shadow: $box-shadow;
@@ -173,7 +197,6 @@ export default {
     svg {
       width: 100%;
       fill: #FFF;
-      // stroke-width: 5;
     }
     &:hover {
       background: darken($primary, 5%);
@@ -184,13 +207,8 @@ export default {
   }
   @media screen and ($tablet) {
     height: 96%;
-    // margin-top: 4%;
     border-radius: 20px;
     padding: 0 1rem 1.2rem 1rem;
   }
-  // @media screen and ($desktop) {
-  //   height: 100%;
-  //   margin-top: 0;
-  // }
 }
 </style>
