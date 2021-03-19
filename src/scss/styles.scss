@@ -13,12 +13,16 @@ body, html {
 }
 
 .app {
-  display: flex;
-  flex-flow: column wrap;
+  display: grid;
+  // flex-flow: column nowrap;
+  grid-template-rows: 3rem 1fr;
 }
 
 .main_content {
-  flex: 1;
+  // flex: 1;
+  // max-height: 50%;
+  overflow: hidden;
+  // border: 1px solid red;
 }
 
 .relative {
