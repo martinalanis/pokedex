@@ -23,6 +23,7 @@ export default {
 .header {
   background: #FFF;
   box-shadow: $box-shadow;
+  z-index: 2;
   @media screen and ($tablet) {
     border-bottom: 1px solid rgba(0,0,0,0.15);
     box-shadow: none;
