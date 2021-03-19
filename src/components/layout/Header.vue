@@ -31,7 +31,6 @@ export default {
 .nav {
   display: flex;
   justify-content: space-between;
-  // background: #FFF;
   align-items: center;
   padding: 0 0.5rem;
   .brand {
@@ -42,7 +41,6 @@ export default {
     font-size: 1.2rem;
   }
   nav {
-    // border: 1px solid #FFF;
     a {
       display: inline-block;
       font-weight: 700;
@@ -50,8 +48,10 @@ export default {
       height: 100%;
       color: #323132;
       text-decoration: none;
-      padding: 0.3rem;
-      // border: 1px solid #fabada
+      padding: 0.3rem 0.6rem;
+      &:hover, &.router-link-exact-active {
+        color: #0b6767;
+      }
     }
   }
 }

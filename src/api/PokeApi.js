@@ -2,8 +2,13 @@ const baseUrl = 'http://pokeapi.co/api/v2'
 
 export default
 {
+  /**
+   * @returns Array of 10 first pokemons
+   */
   list: async () => {
-    return await fetch(`${baseUrl}/pokemon`).then(res => res.json())
+    return await fetch(`${baseUrl}/pokemon`)
+      .then(res => res.json())
+      .then(res => res.results.slice(0, 10).map(item => item.name))
   },
   /**
    * @returns Object array
