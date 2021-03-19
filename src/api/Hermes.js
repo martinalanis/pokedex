@@ -1,4 +1,4 @@
-const baseUrl = 'http://beta.soldai.com/bill-cipher'
+const baseUrl = process.env.VUE_APP_SOLDAI_URL
 const soldAiKey = process.env.VUE_APP_SOLDAI_KEY
 
 export default

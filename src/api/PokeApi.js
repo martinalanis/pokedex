@@ -1,4 +1,4 @@
-const baseUrl = 'http://pokeapi.co/api/v2'
+const baseUrl = process.env.VUE_APP_POKEAPI_URL
 
 export default
 {
