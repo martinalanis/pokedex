@@ -7,9 +7,7 @@
       <p class="msg__user">
         {{ isUser ? 'Guest' : 'Hermes' }}
       </p>
-      <div class="msg__text">
-        {{ text }}
-      </div>
+      <div class="msg__text" v-html="text"></div>
     </div>
   </div>
 </template>

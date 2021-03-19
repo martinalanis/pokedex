@@ -28,5 +28,29 @@ export default
     return await fetch(`${baseUrl}/pokemon/${pokemon}`)
       .then(res => res.json())
       .then(res => res.height)
+  },
+  /**
+   * @returns Object array
+   */
+  getTypes: async (pokemon) => {
+    return await fetch(`${baseUrl}/pokemon/${pokemon}`)
+      .then(res => res.json())
+      .then(res => res.types)
+  },
+  /**
+   * @returns Object array
+   */
+  getStats: async (pokemon) => {
+    return await fetch(`${baseUrl}/pokemon/${pokemon}`)
+      .then(res => res.json())
+      .then(res => res.stats)
+  },
+  /**
+   * @returns Object array | 10 first results only
+   */
+  getMoves: async (pokemon) => {
+    return await fetch(`${baseUrl}/pokemon/${pokemon}`)
+      .then(res => res.json())
+      .then(res => res.moves.slice(0, 10))
   }
 }

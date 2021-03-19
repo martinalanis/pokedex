@@ -51,10 +51,10 @@ export default {
     }, 1000)
   },
   methods: {
+    /**
+     * Main methods
+     */
     async askQuestion (question) {
-      /**
-       * Ask question to soldAi bot
-       */
       try {
         const { default_answer, parameters, intent_info } = await Hermes.askQuestion(this.sessionId, question)
           .then(res => res.current_response)
@@ -74,7 +74,7 @@ export default {
         console.log(error)
       }
     },
-    handleResponse (answer, parameters, intentInfo) {
+    async handleResponse (answer, parameters, intentInfo) {
       /**
        * Get pokemons detected by chatbot
        */
@@ -84,62 +84,17 @@ export default {
        */
       const { type } = JSON.parse(intentInfo.properties)
       console.log(type)
-      const availableFeatures = ['ability', 'weight', 'height']
+      const availableFeatures = ['ability', 'weight', 'height', 'types', 'stats', 'moves']
       if (availableFeatures.includes(type)) {
-        console.log('includes')
-        this[`${type}Response`](answer, pokemons)
-      }
-    },
-    async abilityResponse (answer, pokemons) {
-      try {
-        const abilities = []
-        for (const pokemon of pokemons) {
-          const pokemonAbilities = await PokeApi.getAbilities(pokemon)
-            .then(res => res.map(obj => obj.ability.name).join(', '))
-          abilities.push(pokemonAbilities)
+        try {
+          // Respondes after executing method that depends on type found in users question
+          this.pushToConversation(
+            await this[`${type}Response`](answer, pokemons),
+            false
+          )
+        } catch (error) {
+          console.log(error)
         }
-        this.pushToConversation(
-          answer + ' ' + abilities.join(' y '),
-          false
-        )
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    async getAbilities (pokemon) {
-      try {
-        return await PokeApi.getAbilities(pokemon)
-          .then(res => res.map(obj => obj.ability.name).join(', '))
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    async weightResponse (answer, pokemons) {
-      try {
-        const weights = []
-        for (const pokemon of pokemons) {
-          weights.push(await PokeApi.getWeight(pokemon))
-        }
-        this.pushToConversation(
-          answer + ' ' + weights.join(' y '),
-          false
-        )
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    async heightResponse (answer, pokemons) {
-      try {
-        const heights = []
-        for (const pokemon of pokemons) {
-          heights.push(await PokeApi.getHeight(pokemon))
-        }
-        this.pushToConversation(
-          answer + ' ' + heights.join(' y '),
-          false
-        )
-      } catch (error) {
-        console.log(error)
       }
     },
     pushToConversation (message, isUser = true) {
@@ -154,6 +109,126 @@ export default {
         }
         this.updateScroll()
       }
+    },
+    /**
+     * Custom responses
+     */
+    async abilityResponse (answer, pokemons) {
+      try {
+        const abilities = []
+        for (const pokemon of pokemons) {
+          const pokemonAbilities = await PokeApi.getAbilities(pokemon)
+            .then(res => res.map(obj => obj.ability.name).join(', '))
+          abilities.push(pokemonAbilities)
+        }
+        return `${answer} <b>${abilities.join(' y ')}</b>`
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async heightResponse (answer, pokemons) {
+      try {
+        const heights = []
+        for (const pokemon of pokemons) {
+          heights.push(await PokeApi.getHeight(pokemon))
+        }
+        return `${answer} <b>${heights.join(' y ')}</b>`
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async movesResponse (answer, pokemons) {
+      try {
+        const moves = []
+        for (const pokemon of pokemons) {
+          const pokemonMoves = await PokeApi.getMoves(pokemon)
+            .then(res => res.map(obj => {
+              return `<tr><td>${obj.move.name}</td></tr>`
+            }))
+          console.log(pokemonMoves)
+          moves.push({
+            pokemon,
+            data: pokemonMoves.join('')
+          })
+        }
+        return `
+          <span class="answer_title">${answer}:</span>
+          ${this.printTables(moves)}`
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async statsResponse (answer, pokemons) {
+      try {
+        const stats = []
+        for (const pokemon of pokemons) {
+          const pokemonStats = await PokeApi.getStats(pokemon)
+            .then(res => res.map(obj => {
+              return `<tr><th>${obj.stat.name}:</th><td>${obj.base_stat}</td></tr>`
+            }))
+          stats.push({
+            pokemon,
+            data: pokemonStats.join('')
+          })
+        }
+        return `
+          <span class="answer_title">${answer}:</span>
+          ${this.printTables(stats)}`
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async typesResponse (answer, pokemons) {
+      try {
+        const types = []
+        for (const pokemon of pokemons) {
+          const pokemonTypes = await PokeApi.getTypes(pokemon)
+            .then(res => res.map(obj => obj.type.name).join(', '))
+          types.push(pokemonTypes)
+        }
+        return `${answer} <b>${types.join(' y ')}</b>`
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async weightResponse (answer, pokemons) {
+      try {
+        const weights = []
+        for (const pokemon of pokemons) {
+          weights.push(await PokeApi.getWeight(pokemon))
+        }
+        return `${answer} <b>${weights.join(' y ')}</b>`
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    /**
+     * Helpers
+     */
+    async getAbilities (pokemon) {
+      try {
+        return await PokeApi.getAbilities(pokemon)
+          .then(res => res.map(obj => obj.ability.name).join(', '))
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    /**
+     * @param Data: Array of stats list of each pokemon found
+     */
+    printTables (data) {
+      return data.map(item => {
+        return `
+          <p class="table_title">
+            <b>${item.pokemon}</b>
+          </p>
+          <table class="table">
+            <tbody>
+              ${item.data}
+            </tbody>
+          </table>
+        `
+      }).join('y <br>')
     },
     updateScroll () {
       console.log('scroll update')

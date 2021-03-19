@@ -14,15 +14,11 @@ body, html {
 
 .app {
   display: grid;
-  // flex-flow: column nowrap;
   grid-template-rows: 3rem 1fr;
 }
 
 .main_content {
-  // flex: 1;
-  // max-height: 50%;
   overflow: hidden;
-  // border: 1px solid red;
 }
 
 .relative {
@@ -35,4 +31,28 @@ body, html {
     width: 90%;
     margin: 0 auto;
   }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  th, td {
+    padding: 0.3em 0.2em;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  th {
+    text-align: left;
+  }
+}
+
+.answer_title {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.table_title {
+  text-align: left;
+  text-transform: capitalize;
+  margin-bottom: 0.3rem;
+  color: #0b6767;
 }
