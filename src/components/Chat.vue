@@ -12,12 +12,12 @@
     </div>
     <form
       class="w-100 relative chat__form"
-      @submit.prevent="pushToConversation"
+      @submit.prevent="pushToConversation(currentMessage)"
     >
       <input
         type="text"
         class="chat__input"
-        v-model="currentMessage"
+        v-model.trim="currentMessage"
       />
       <button type="submit" class="chat__button">
         <svg class="svg-icon" viewBox="0 0 20 20">
@@ -30,6 +30,7 @@
 
 <script>
 import ChatMessage from '@/components/ChatMessage'
+import { Hermes, PokeApi } from '@/api'
 
 export default {
   name: 'Chat',
@@ -39,17 +40,74 @@ export default {
   data () {
     return {
       conversation: [],
-      currentMessage: ''
+      currentMessage: '',
+      sessionId: null
     }
   },
+  created () {
+    this.sessionId = new Date().getTime()
+    setTimeout(() => {
+      // this.pushToConversation('Hola', true)
+      this.askQuestion('Hola')
+    }, 1000)
+  },
   methods: {
-    pushToConversation () {
-      if (this.currentMessage) {
+    async askQuestion (question) {
+      /**
+       * Ask question to soldAi bot
+       */
+      try {
+        const { default_answer, parameters, intent_info } = await Hermes.askQuestion(this.sessionId, question)
+          .then(res => res.current_response)
+        // Add to conversation in bot mode
+        if (parameters.entities && intent_info) {
+          this.handleResponse(default_answer, parameters, intent_info)
+        } else if (!intent_info.properties) {
+          this.pushToConversation('Por el momento no cuento con la información de ese pokemon', false)
+        } else {
+          this.pushToConversation(default_answer, false)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async getAbilities (pokemon) {
+      try {
+        return await PokeApi.getAbilities(pokemon)
+          .then(res => res.map(obj => obj.ability.name).join(', '))
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async handleResponse (answer, parameters, intentInfo) {
+      try {
+        const pokemons = parameters.entities.map(entity => entity.name)
+        const { type } = JSON.parse(intentInfo.properties)
+        if (type === 'ability') {
+          const abilities = []
+          for (const pokemon of pokemons) {
+            abilities.push(await this.getAbilities(pokemon))
+          }
+          this.pushToConversation(
+            answer + ' ' + abilities.join(' y '),
+            false
+          )
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    pushToConversation (message, isUser = true) {
+      if (message) {
         this.conversation.push({
-          isUser: true,
-          text: this.currentMessage
+          isUser,
+          text: message
         })
-        this.currentMessage = ''
+        if (isUser) {
+          this.currentMessage = ''
+          // console.log('ask to bot')
+          this.askQuestion(message)
+        }
         this.updateScroll()
       }
     },
@@ -110,6 +168,7 @@ export default {
     margin-left: 0.5rem;
     border: none;
     border-radius: 50%;
+    cursor: pointer;
     box-shadow: $box-shadow-depth-2;
     svg {
       width: 100%;
