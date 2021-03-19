@@ -2,12 +2,14 @@
   <div class="chat w-100">
     <div class="chat__box">
       <div class="w-100 chat__box_container" id="chat-box">
-        <chat-message
-          v-for="({ isUser, text }, i) in conversation"
-          :key="i"
-          :is-user="isUser"
-          :text="text"
-        />
+        <transition-group name="fade">
+          <chat-message
+            v-for="({ isUser, text }, i) in conversation"
+            :key="i+text"
+            :is-user="isUser"
+            :text="text"
+          />
+        </transition-group>
       </div>
     </div>
     <form
@@ -18,6 +20,7 @@
         type="text"
         class="chat__input"
         v-model.trim="currentMessage"
+        autofocus
       />
       <button type="submit" class="chat__button">
         <svg class="svg-icon" viewBox="0 0 20 20">
@@ -259,6 +262,7 @@ export default {
   }
   &__box_container {
     overflow-y: auto;
+    overflow-x: hidden;
   }
   &__form {
     display: flex;
