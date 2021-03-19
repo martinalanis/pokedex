@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100 chat">
+  <div class="chat w-100">
     <div class="chat__box">
       <div class="w-100 chat__box_container" id="chat-box">
         <chat-message
@@ -68,8 +68,9 @@ export default {
 .chat {
   display: grid;
   grid-template-rows: 1fr 2.5rem;
-  padding: 0.8rem;
+  padding: 0 0.8rem 0.8rem 0.8rem;
   background: #F3F6FB;
+  height: 100%;
   &__box {
     display: flex;
     position: relative;
@@ -77,11 +78,11 @@ export default {
     justify-content: flex-end;
     align-items: center;
     justify-items: flex-end;
-    overflow-y: scroll;
+    overflow-y: hidden;
     // border: 1px solid blue;
   }
   &__box_container {
-    overflow: scroll;
+    overflow-y: auto;
   }
   &__form {
     display: flex;
@@ -122,5 +123,15 @@ export default {
       outline: none;
     }
   }
+  @media screen and ($tablet) {
+    height: 96%;
+    // margin-top: 4%;
+    border-radius: 20px;
+    padding: 0 1rem 1.2rem 1rem;
+  }
+  // @media screen and ($desktop) {
+  //   height: 100%;
+  //   margin-top: 0;
+  // }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100">
+  <div class="home container h-100">
     <Chat/>
   </div>
 </template>
@@ -39,3 +39,12 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.home {
+  display: flex;
+  align-items: center;
+  @media screen and ($tablet) {
+    padding: 1rem 0;
+  }
+}
+</style>

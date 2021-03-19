@@ -28,3 +28,11 @@ body, html {
 .relative {
   position: relative;
 }
+
+.container {
+  width: 100%;
+  @media screen and ($tablet) {
+    width: 90%;
+    margin: 0 auto;
+  }
+}
